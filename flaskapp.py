@@ -1,0 +1,1 @@
+from growthpredict import app
