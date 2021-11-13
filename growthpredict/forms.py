@@ -4,6 +4,8 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import SelectField, widgets, DateTimeField, StringField, PasswordField, SubmitField, BooleanField,TextAreaField,SelectMultipleField
 from wtforms.validators import InputRequired, DataRequired, Length, Email, EqualTo, ValidationError, Optional
 from growthpredict.models import *
+from flask_admin import BaseView, expose, AdminIndexView
+from flask_admin.contrib.sqla import ModelView
 import email_validator
 from flask import flash, redirect, url_for, Markup
 #from wtforms.fields.html5 import DateField
@@ -62,6 +64,20 @@ class UpdateAccountForm(FlaskForm):
 class AddTopic(FlaskForm):
     title = StringField('Title', validators=[DataRequired()],render_kw={"placeholder": "It is your content title"})
     image_file = FileField('Choose txt file with usernames', validators=[FileAllowed(['txt'])])
-    image_file_url = StringField('Your file now: ' )
-    submit = SubmitField('Add task')
+    type = SelectField(u'Type', choices=[('Instagram', 'Instagram'), ('Twitter', 'Twitter')])
+    submit = SubmitField('Add topic')
+
+class MicroBlogModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+
+
+class MyAdminIndexView(AdminIndexView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin()
 

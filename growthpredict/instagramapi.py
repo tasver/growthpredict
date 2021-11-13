@@ -4,7 +4,8 @@ import re
 import math
 from random import randint
 from time import sleep
-
+from growthpredict import models,db
+from growthpredict.models import *
 
 inst_url = "https://www.instagram.com/p/"
 login = "dota2_fun_moments"
@@ -25,7 +26,7 @@ views = []
 likers = []
 commenters = []
 
-number_medias = 50
+number_medias = 10
 
 data_dict = {
     'pk': 0,
@@ -214,6 +215,60 @@ def write_csv_medias_info_all(usernames, new_file_name):
                 print(f"Username {username} is completed {n}/100 with {media_number} medias")
             except:
                 print((f"Username {username} is not finded or not public"))
+
+def return_parsing_info_all(usernames):
+    fieldnames = ['username', 'pk', 'id', 'code', 'link', 'views', 'likers', 'commenters', 'followers']
+    n = 0
+    for username in usernames:
+        sleep(randint(3, 11))
+        # writer.writeheader()
+        try:
+            user_id = cl.user_id_from_username(username)
+            medias = cl.user_medias(user_id, number_medias)
+            # filename = username +".csv"
+            user_info = cl.user_info_by_username(username)
+            count_follow = user_info.follower_count
+            media_number = 0
+            for media in medias:
+                pks.append(media.pk)
+                ids.append(media.id)
+                codes.append(media.code)
+                link = inst_url + media.code
+                links.append(link)
+                views.append(media.view_count)
+                likers.append(media.like_count)
+                commenters.append(media.comment_count)
+                new_elem = {
+                    'username': username,
+                    'pk': media.pk,
+                    'id': media.id,
+                    'code': media.code,
+                    'link': link,
+                    'views': media.view_count,
+                    'likers': media.like_count,
+                    'commenters': media.comment_count,
+                    'followers': count_follow
+                }
+                data_dict.update(new_elem)
+
+
+                test_elem = Post_inst(username= username,
+                    pk= media.pk,
+                    id_post= media.id,
+                    code= media.code,
+                    link= link,
+                    views= media.view_count,
+                    likes= media.like_count,
+                    commenters= media.comment_count,
+                    followers= count_follow)
+
+                db.session.add(test_elem)
+                db.session.commit()
+                media_number = media_number + 1
+            n = n + 1
+            print(f"Username {username} is completed {n}/100 with {media_number} medias")
+        except:
+            print((f"Username {username} is not finded or not public"))
 
 
 def read_from_file(filename):
