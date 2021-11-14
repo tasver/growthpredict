@@ -248,6 +248,291 @@ def read_from_file(filename):
             list_usernames.append(current_username)
     return list_usernames
 
+
+bd_dict = {
+    'username': '',
+    'avg_view': 0,
+    'avg_like': 0,
+    'avg_retwwet': 0,
+    'avg_reply': 0,
+    'avg_quote': 0,
+    'media': 0,
+    'avg_er': 0,
+    'growth': 0,
+    'followers': 0,
+    'growth_predict': 0
+
+}
+filename = 'test1.csv'
+import pandas as pd
+
+
+def get_avg_without_media_gowth(filename):
+    data = pd.read_csv(filename)
+    # print(data)
+    average_data = data.groupby('username').mean()
+    # print(average_data)
+    # @av_data = average_data.transform(0)
+
+    # print(av_data)
+    for elem in average_data.iterrows():
+        # print(elem)
+        bd_dict_int = {
+            'username': elem[0],
+            'avg_view': int(round(elem[1][2])),
+            'avg_like': int(round(elem[1][5])),
+            'avg_retwwet': int(round(elem[1][3])),
+            'avg_reply': int(round(elem[1][4])),
+            'avg_quote': int(round(elem[1][6])),
+            'media': 0,
+            'avg_er': int(round((elem[1][5] + elem[1][3] + elem[1][4] + elem[1][6]) / elem[1][7] * 100)),
+            'growth': 0,
+            'followers': int(round(elem[1][7])),
+            'growth_predict': 0
+        }
+        bd_dict1 = {
+            'username': elem[0],
+            'avg_view': elem[1][2],
+            'avg_like': elem[1][5],
+            'avg_retwwet': elem[1][3],
+            'avg_reply': elem[1][4],
+            'avg_quote': elem[1][6],
+            'media': 0,
+            'avg_er': (elem[1][5] + elem[1][3] + elem[1][4] + elem[1][6]) / elem[1][7] * 100,
+            'growth': 0,
+            'followers': elem[1][7],
+            'growth_predict': 0
+        }
+        print(bd_dict1)
+
+
+def get_avg_with_media_gowth(filename):
+    data = pd.read_csv(filename)
+    # print(data)
+    average_data = data.groupby('username').mean()
+    # print(average_data)
+    # @av_data = average_data.transform(0)
+
+    # print(av_data)
+    for elem in average_data.iterrows():
+        # print(elem)
+        bd_dict_int = {
+            'username': elem[0],
+            'avg_view': int(round(elem[1][2])),
+            'avg_like': int(round(elem[1][5])),
+            'avg_retwwet': int(round(elem[1][3])),
+            'avg_reply': int(round(elem[1][4])),
+            'avg_quote': int(round(elem[1][6])),
+            'media': 0,
+            'avg_er': int(round((elem[1][5] + elem[1][3] + elem[1][4] + elem[1][6]) / elem[1][7] * 100)),
+            'growth': 0,
+            'followers': int(round(elem[1][7])),
+            'growth_predict': 0
+        }
+        bd_dict1 = {
+            'username': elem[0],
+            'avg_view': elem[1][2],
+            'avg_like': elem[1][5],
+            'avg_retwwet': elem[1][3],
+            'avg_reply': elem[1][4],
+            'avg_quote': elem[1][6],
+            'media': 0,
+            'avg_er': (elem[1][5] + elem[1][3] + elem[1][4] + elem[1][6]) / elem[1][7] * 100,
+            'growth': 0,
+            'followers': elem[1][7],
+            'growth_predict': 0
+        }
+        print(bd_dict1)
+
+
+filename2 = 'test_twitter_file_for.csv'
+
+
+def normalising_data_and_create_scale(filename):
+    data = pd.read_csv(filename, encoding='unicode_escape')
+    # print(data)
+    # print(type(data.RETWEETav))
+    data2 = data.drop(data.index[data['RETWEETav'] < 1])
+    data2 = data2.drop(data2.index[data2['REPLYav'] < 1])
+    data2 = data2.drop(data2.index[data2['LIKEav'] < 1])
+    data2 = data2.drop(data2.index[data2['QUOTEav'] < 1])
+    data2 = data2.drop(data2.index[data2['ERaverage'] < 0])
+    data2 = data2.drop(data2.index[data2['growth'] < 1])
+    # data2 = data2.drop(data2.index[data2['QUOTEav'] < 1])
+    new_scale = data2.drop('REPLYav', axis=1)
+    new_scale = new_scale.drop('LIKEav', axis=1)
+    new_scale = new_scale.drop('QUOTEav', axis=1)
+    new_scale = new_scale.drop('ERaverage', axis=1)
+    new_scale = new_scale.drop('RETWEETav', axis=1)
+    new_scale = new_scale.drop('media', axis=1)
+    new_scale_growth_precent = new_scale['growth'] / new_scale['followers'] * 100
+    new_scale_growth_precent = new_scale_growth_precent.sort_values()
+    percent_to_delete = int(len(new_scale_growth_precent) - 0.05 * len(new_scale_growth_precent))
+    print(percent_to_delete)
+    print(new_scale_growth_precent)
+    scale = new_scale_growth_precent[0:percent_to_delete - 1]
+    print(scale)
+    max_of_scale = scale.max()
+    print(max_of_scale)
+    # new_scale = new_scale.drop('followers', axis=1)
+    # print(new_scale)
+    # rint(data2)
+
+    return data2, scale, max_of_scale
+
+
+normalising_data_and_create_scale(filename2)
+
+from sklearn.model_selection import train_test_split
+from sklearn import linear_model
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import PolynomialFeatures
+
+
+def create_poly2_model(filename):
+    df = pd.read_csv('TWITTER_TEST_csv.csv')
+    one_for_test = pd.read_csv('test_1twitter.csv')
+    X = df.drop('growth', axis=1)
+    X = X.drop('username', axis=1)
+    # X = X.drop('RETWEETav',axis=1)
+    X = X.drop('REPLYav', axis=1)
+    # X = X.drop('LIKEav',axis=1)
+    X = X.drop('QUOTEav', axis=1)
+    Y_one = one_for_test['growth']
+    X_one = one_for_test.drop('growth', axis=1)
+    X_one = X_one.drop('username', axis=1)
+    X_one = X_one.drop('REPLYav', axis=1)
+    X_one = X_one.drop('QUOTEav', axis=1)
+
+    Y = df['growth']
+
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=100)
+
+    poly = PolynomialFeatures(2)
+
+    X_train_poly = poly.fit_transform(X_train)
+    X_test_poly = poly.fit_transform(X_test)
+
+    X_one_poly = poly.transform(X_one)
+    X_ = poly.transform(X)
+
+    model_with_poly = linear_model.LinearRegression()
+    model_with_poly.fit(X_train_poly, Y_train)
+    print('success create')
+    return model_with_poly, poly
+
+
+test_model, test_poly = create_poly2_model("TWITTER_TEST_csv.csv")
+
+
+def use_poly2_model(input, model, poly):
+    one_for_test = pd.read_csv(input)
+    Y_one = one_for_test['growth']
+    X_one = one_for_test.drop('growth', axis=1)
+    X_one = X_one.drop('username', axis=1)
+    X_one = X_one.drop('REPLYav', axis=1)
+    X_one = X_one.drop('QUOTEav', axis=1)
+    X_one_poly = poly.transform(X_one)
+    test = model.predict(X_one_poly)
+    return test
+
+
+print(use_poly2_model('test_1twitter.csv', test_model, test_poly))
+
+
+def create_linear_model(filename):
+    df = pd.read_csv('TWITTER_TEST_csv.csv')
+    one_for_test = pd.read_csv('test_1twitter.csv')
+    # delaney_descriptors_df = pd.read_csv('TWITTER_TEST_csv_0media.csv')
+    # df.drop('media', axis=1)
+    # df.drop('ERaverage', axis=1)
+
+    X = df.drop('growth', axis=1)
+    X = X.drop('username', axis=1)
+    # X = X.drop('RETWEETav',axis=1)
+    X = X.drop('REPLYav', axis=1)
+    # X = X.drop('LIKEav',axis=1)
+    X = X.drop('QUOTEav', axis=1)
+    Y_one = one_for_test['growth']
+    X_one = one_for_test.drop('growth', axis=1)
+    X_one = X_one.drop('username', axis=1)
+    X_one = X_one.drop('REPLYav', axis=1)
+    X_one = X_one.drop('QUOTEav', axis=1)
+    Y = df['growth']
+
+    corr = df.corr()
+    #corr
+
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=100)
+
+    model = linear_model.LinearRegression()
+    model.fit(X_train, Y_train)
+
+    # Y_pred_train = model.predict(X_train)
+    # print('Coefficients:', model.coef_)
+    # print('Intercept:', model.intercept_)
+    # print('Mean squared error (MSE): %.2f'
+    #    % mean_squared_error(Y_train, Y_pred_train))
+    # print('Coefficient of determination (R^2): %.2f'
+    #    % r2_score(Y_train, Y_pred_train))
+    # Y_pred_test = model.predict(X_test)
+    # print('Coefficients:', model.coef_)
+    # print('Intercept:', model.intercept_)
+    # print('Mean squared error (MSE): %.2f'
+    #    % mean_squared_error(Y_test, Y_pred_test))
+    # print('Coefficient of determination (R^2): %.2f'
+    #    % r2_score(Y_test, Y_pred_test))
+    print("linear model success created")
+    return model
+
+
+test_linear_model = create_linear_model('TWITTER_TEST_csv.csv')
+
+
+def use_linear_model(input, model):
+    one_for_test = pd.read_csv(input)
+    Y_one = one_for_test['growth']
+    X_one = one_for_test.drop('growth', axis=1)
+    X_one = X_one.drop('username', axis=1)
+    X_one = X_one.drop('REPLYav', axis=1)
+    X_one = X_one.drop('QUOTEav', axis=1)
+    test = model.predict(X_one)
+    return test
+
+
+print(use_linear_model('test_1twitter.csv', test_linear_model))
+
+
+def create_scale(filename):
+    df = pd.read_csv(filename)
+
+
+"""
+yintercept = '%.2f' % model.intercept_
+growth = '%.4f * growth ' % model.coef_[0]
+followers = '%.4f * followers' % model.coef_[1]
+RETWEETav = '%.4f * RETWEETav' % model.coef_[2]
+REPLYav = '%.4f * REPLYav' % model.coef_[3]
+LIKEav = '%.4f * LIKEav' % model.coef_[4]
+QUOTEav = '%.4f * QUOTEav' % model.coef_[4]
+
+print('Predict_Linear_regeression = '  + 
+      ' ' + 
+      growth + 
+      ' + ' + 
+      followers + 
+      ' + ' + 
+      RETWEETav + 
+      ' + ' + 
+      REPLYav + 
+      ' + ' +
+      LIKEav +
+      ' + ' +
+      QUOTEav)
+"""
+
+
+
 #usernames = read_from_file('twitter_eng_151_200.txt')
 #write_many(usernames, 'twitter_eng_all_test4.csv')
 
