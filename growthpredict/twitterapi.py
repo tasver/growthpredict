@@ -1,4 +1,6 @@
 import csv
+import os
+
 import requests
 import json
 
@@ -54,13 +56,13 @@ test_dict = {
 def parse_id_and_foll_username(username):
     tmp_link = f'https://api.twitter.com/2/users/by/username/{username}'
     get_followers = requests.get(tmp_link, headers=headers, params=params_get_foll)
-    with open("data_with_id_andfollowers.json", "w") as data_file:
+    with open("growthpredict/tmp/data_with_id_andfollowers.json", "w") as data_file:
         pretty_json = json.loads(get_followers.text)
         json.dump(pretty_json, data_file, indent=4)
 
 
 def get_tweets_by_id(id):
-    with open("filtered_data_file.json", "w") as data_file:
+    with open("growthpredict/tmp/filtered_data_file.json", "w") as data_file:
         response = requests.get(f'https://api.twitter.com/2/users/{id}/tweets', headers=headers, params=params)
 
         pretty_json2 = json.loads(response.text)
@@ -69,7 +71,7 @@ def get_tweets_by_id(id):
 
 
 def get_id_foll():
-    with open('data_with_id_andfollowers.json', 'r') as f:
+    with open('growthpredict/tmp/data_with_id_andfollowers.json', 'r') as f:
         json_obj = json.loads(f.read())
         followers = json_obj['data']['public_metrics']['followers_count']
         tweet_user_id = json_obj['data']['id']
@@ -81,7 +83,7 @@ def write_csv(username):
     tweet_user_id, followers = get_id_foll()
     get_tweets_by_id(tweet_user_id)
 
-    with open('filtered_data_file.json', 'r') as f:
+    with open('growthpredict/tmp/filtered_data_file.json', 'r') as f:
         json_obj = json.loads(f.read())
         # df = pd.DataFrame(json_obj['data'])
         # print(df)
@@ -180,12 +182,12 @@ def write_many(usernames, filename):
 
             print()
 
-            with open('filtered_data_file.json', 'r') as f:
+            with open('growthpredict/tmp/filtered_data_file.json', 'r') as f:
                 json_obj = json.loads(f.read())
                 real_number_posts = json_obj['meta']['result_count']
 
             try:
-                while n < max_result - 10 or n < real_number_posts:
+                while n < max_result - 10 and n < real_number_posts:
                     author_id = json_obj['data'][n]['author_id']
                     tweet_id = json_obj['data'][n]['id']
                     tweet_link = link_twitter + str(author_id) + "/status/" + str(tweet_id)
@@ -231,10 +233,11 @@ def write_many(usernames, filename):
                     test_dict.update(new_elem)
                     writer.writerow(new_elem)
                     n = n + 1
-
+                    print(test_dict)
             except ValueError:
                 "something went wrong"
             n = 0
+        print(test_dict)
 
 
 def read_from_file(filename):

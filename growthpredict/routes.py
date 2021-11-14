@@ -6,8 +6,12 @@ from functools import wraps
 from growthpredict.twitterapi import *
 from growthpredict.models import *
 import os
-
+from worker import *
+import time
 from growthpredict.forms import *
+from datetime import datetime
+
+
 @app.route('/')
 @app.route('/index')
 @app.route('/home')
@@ -89,7 +93,7 @@ def add_topic():
         test2 = file.decode('utf-8')
         separated_string = test2.splitlines()
         print(separated_string)
-        list_users = []
+
 
 
         if type == 'Instagram':
@@ -98,33 +102,32 @@ def add_topic():
                 usernam = Post_inst(username=elem)
                 db.session.add(usernam)
                 test_topic.usernames.append(usernam)
-            print(list_users)
+            print(test_topic)
             db.session.add(test_topic)
             db.session.commit()
 
         if type == 'Twitter':
-            test_topic2 = Topic_twit(name=form.title.data)
+            test_topic = Topic_twit(name=form.title.data)
             for elem in separated_string:
                 usernam = Post_twit(username=elem)
                 db.session.add(usernam)
-                test_topic2.usernames.append(usernam)
-            print(list_users)
-            db.session.add(test_topic2)
+                test_topic.usernames.append(usernam)
+            print(test_topic)
+            db.session.add(test_topic)
             db.session.commit()
+        namefile = test_topic.name + '.csv'
+        date_posted = datetime.now() + timedelta(minutes=1)
+        write_many(separated_string,f'growthpredict/tmp/{namefile}')
 
-        #split_n_0 = read_from_file(file)
-        #print(split_n_0)
-        #write_csv_medias_info_all(separated_string, "split_n_11.csv")
-        #db.session.add()
-        #return_parsing_info_all(separated_string)
+        #job = queue.enqueue_at(date_posted, write_many,separated_string,'test_file1.csv', result_ttl=-1)
+        #registry = ScheduledJobRegistry(queue=queue)
+        #print(job in registry)
+        #print('Job id: %s' % job.id)
+        #if post.job_id == None:
+        #    post.job_id = str(job.id)
+        #else:
+        #    post.job_id = str(post.job_id) + str(job.id)
 
-        #post = Topic(title = form.title.data, content = form.content.data, \
-        #            author= current_user, date_posted = date_posted2, \
-        #            image_file = file_path_3, tags = form.tags.data, \
-        #            already_posted=False,notes= form.notes.data
-        #            )
-        #db.session.add(post)
-        #db.session.commit()
         flash('Your topic has been created!', 'success')
         #return redirect(url_for('home'))
     return render_template('add_topic.html', title='New Topic', form = form, legend = 'New Topic')
