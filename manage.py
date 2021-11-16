@@ -1,4 +1,4 @@
-from growthpredict import manager
+#from growthpredict import manager
 
-if __name__  == '__main__':
-    manager.run()
+#if __name__  == '__main__':
+#    manager.run()
