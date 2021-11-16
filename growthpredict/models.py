@@ -65,7 +65,7 @@ class Post_twit(db.Model):
 class Topic_inst(db.Model):
     __tablename__ = 'topics_inst'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
+    name = db.Column(db.String(120), unique=True,nullable=False)
     model_linear = db.Column(db.PickleType())
     model_poly = db.Column(db.PickleType())
     poly = db.Column(db.PickleType())
@@ -81,7 +81,7 @@ class TopicPosts_inst(db.Model):
 class Topic_twit(db.Model):
     __tablename__ = 'topics_twit'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
+    name = db.Column(db.String(120), unique=True,nullable=False)
     model_linear = db.Column(db.PickleType())
     model_poly = db.Column(db.PickleType())
     poly= db.Column(db.PickleType())

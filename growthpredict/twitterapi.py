@@ -82,19 +82,22 @@ def get_id_foll():
     return tweet_user_id, followers
 
 
-def write_csv(username):
+def write_csv(username,filename_main=None):
     parse_id_and_foll_username(username)
     tweet_user_id, followers = get_id_foll()
     get_tweets_by_id(tweet_user_id)
-
+    #filename_main
     with open('growthpredict/tmp/filtered_data_file.json', 'r') as f:
         json_obj = json.loads(f.read())
         # df = pd.DataFrame(json_obj['data'])
         # print(df)
         # test = json_obj['data'][0]
         real_number_posts = json_obj['meta']['result_count']
+        if filename_main:
+            filename=filename_main
+        else:
+            filename = 'growthpredict/tmp/' + username + "twitter" + ".csv"
 
-        filename = username + "twitter" + ".csv"
         with open(filename, 'w') as csvfile:
             fieldnames = ['username', 'author_id', 'tweet_id', 'tweet_link', 'view_count', 'retweet_count',
                           'reply_count', 'like_count', 'quote_count', 'followers']
@@ -102,7 +105,7 @@ def write_csv(username):
             writer.writeheader()
             n = 0
             media_n = 0
-            print("**********************************")
+            #print("**********************************")
             try:
                 while n < real_number_posts:
                     author_id = json_obj['data'][n]['author_id']
@@ -112,26 +115,26 @@ def write_csv(username):
                     reply_count = json_obj['data'][n]['public_metrics']['reply_count']
                     like_count = json_obj['data'][n]['public_metrics']['like_count']
                     quote_count = json_obj['data'][n]['public_metrics']['quote_count']
-                    print(followers, author_id, tweet_id, tweet_link, retweet_count, reply_count, like_count,
-                          quote_count)
+                    #print(followers, author_id, tweet_id, tweet_link, retweet_count, reply_count, like_count,
+                    #      quote_count)
                     try:
                         list_medias = json_obj['data'][n]['attachments']['media_keys']
-                        print(list_medias)
+                        #print(list_medias)
 
                         for media in list_medias:
 
-                            print(media)
+                            #print(media)
                             # media_n = len(list_medias)
-                            print(media_n)
+                            #print(media_n)
                             # print(json_obj['includes']['media'].get(media_n))
                             if json_obj['includes']['media'][media_n]['type'] == 'video':
                                 view_count = json_obj['includes']['media'][media_n]['public_metrics']['view_count']
-                                print("this is video")
-                                print(view_count)
-                                print(media)
+                                #print("this is video")
+                                #print(view_count)
+                                #print(media)
                             else:
                                 view_count = 0
-                                print(view_count)
+                                #print(view_count)
                             media_n = media_n + 1
                             # print(view_count)
 
@@ -153,7 +156,7 @@ def write_csv(username):
                     test_dict.update(new_elem)
                     writer.writerow(new_elem)
                     n = n + 1
-                    print(n)
+                    #print(n)
 
             except ValueError:
                 "something went wrong"
@@ -326,7 +329,21 @@ def get_avg_without_media_growth(filename, obj_topic):
     db.session.add(obj_topic)
     db.session.commit()
 
+def get_avg_without_media_growth_without_saving(filename):
+    data = pd.read_csv(filename)
+    average_data = data.groupby('username').mean()
+    for elem in average_data.iterrows():
 
+        bd_dict1 = {
+            'username': elem[0],
+            'RETWEETav': elem[1][3],
+            'REPLYav': elem[1][4],
+            'LIKEav': elem[1][5],
+            'QUOTEav': elem[1][6],
+            'followers': elem[1][7],
+            'growth': 0,
+        }
+    return bd_dict1
 
 def get_avg_with_media_gowth(filename):
     data = pd.read_csv(filename)

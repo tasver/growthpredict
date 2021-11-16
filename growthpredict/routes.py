@@ -19,7 +19,15 @@ import pickle
 @app.route('/index')
 @app.route('/home')
 def home():
-    return render_template('home.html')
+    if current_user.is_authenticated:
+        page = request.args.get('page', 1, type=int)
+        topics=db.session.query(models.Topic_twit).paginate(page,10,False)
+        #topics = Topic_twit.query.all.paginate(page,10,False)
+
+        #posts = Post.query.filter_by(user_id=user.id).filter_by(notes=False).order_by(Post.date_posted.desc()).paginate(page, 10, False)
+        return render_template('home.html', topics=topics)
+    else:
+        return render_template('home_dev.html')
 
 
 
@@ -169,35 +177,10 @@ def add_topic():
             db.session.flush()
             db.session.commit()
             #MlModels.objects.create(model=data)
-
-            value2 = Topic_twit.query.filter(Topic_twit.name == str(form.title.data)).first()
-            model_new_poly = pickle.loads(value2.model_poly)
-            print("this is first")
-            print(data_for_save_model_poly)
-            print("this is second")
-            print(model_new_poly)
-            new_poly = pickle.loads(value2.poly)
-            model_new_linear = pickle.loads(value2.model_linear)
             file_for_predict = 'test_1twitter.csv'
 
-            read_csv = pd.read_csv(f'growthpredict/tmp/{file_for_predict}')
-            print(use_poly2_model(f'growthpredict/tmp/{file_for_predict}',test_model_poly, test_poly))
+            print(use_poly2_model(f'growthpredict/tmp/{file_for_predict}', test_model_poly, test_poly))
             print(use_linear_model(f'growthpredict/tmp/{file_for_predict}', test_linear))
-
-            print("test use withh download models")
-            print(use_poly2_model(f'growthpredict/tmp/{file_for_predict}', model_new_poly, new_poly))
-            print(use_linear_model(f'growthpredict/tmp/{file_for_predict}', model_new_linear))
-            test_growth = (use_poly2_model(f'growthpredict/tmp/{file_for_predict}', model_new_poly, new_poly))
-            print(test_growth)
-            test_test = test_growth/read_csv.followers*100
-            print('test_test')
-            print(test_test)
-            print(test_test[0])
-            max_of_sc = value2.max_of_scale
-            print('max')
-            print(max_of_sc)
-            our_quality = create_scale_and_detecting_quality(max_of_sc,test_test[0])
-            print(our_quality)
             """
             file_for_predict22 = 'TWITTER_TEST_csv.csv'
             print('secondtry')
@@ -223,6 +206,73 @@ def add_topic():
         flash('Your topic has been created!', 'success')
         #return redirect(url_for('home'))
     return render_template('add_topic.html', title='New Topic', form = form, legend = 'New Topic')
+
+@app.route("/add_predict", methods=['GET', 'POST'])
+@login_required
+def add_predict():
+    form = AddPredict()
+    #test_list_with_data = ['1','2','3','4']
+    if form.validate_on_submit():
+        value2 = Topic_twit.query.filter(Topic_twit.name == str(form.topic.data)).first()
+        model_new_poly = pickle.loads(value2.model_poly)
+        #print("this is first")
+        #print(data_for_save_model_poly)
+        print("this is second")
+        print(model_new_poly)
+        new_poly = pickle.loads(value2.poly)
+        model_new_linear = pickle.loads(value2.model_linear)
+        file_for_predict = 'test_1twitter.csv'
+        read_csv = pd.read_csv(f'growthpredict/tmp/{file_for_predict}')
+
+
+
+
+        print("test use withh download models")
+        print(use_poly2_model(f'growthpredict/tmp/{file_for_predict}', model_new_poly, new_poly))
+        print(use_linear_model(f'growthpredict/tmp/{file_for_predict}', model_new_linear))
+        test_growth = (use_poly2_model(f'growthpredict/tmp/{file_for_predict}', model_new_poly, new_poly))
+        print(test_growth)
+        test_test = test_growth / read_csv.followers * 100
+        print('test_test')
+        print(test_test)
+        print(test_test[0])
+        max_of_sc = value2.max_of_scale
+        print('max')
+        print(max_of_sc)
+        our_quality = create_scale_and_detecting_quality(max_of_sc, test_test[0])
+        print(our_quality)
+
+
+        print("TEST 2 WAY")
+        filename2 = 'predict' + form.username.data +'.csv'
+        filename_for_predict = form.username.data +'.csv'
+        write_csv(form.username.data,filename_main=f'growthpredict/tmp/{filename2}')
+        test_return = get_avg_without_media_growth_without_saving(f'growthpredict/tmp/{filename2}')
+        #df = pd.DataFrame(index=[0]).from_dict(test_return)
+        df=pd.DataFrame([test_return])
+        df.to_csv(rf'growthpredict/tmp/{filename_for_predict}', index=False, header=True)
+        print(test_return)
+        print(use_poly2_model(f'growthpredict/tmp/{filename_for_predict}', model_new_poly, new_poly))
+        print(use_linear_model(f'growthpredict/tmp/{filename_for_predict}', model_new_linear))
+        test_growth = (use_poly2_model(f'growthpredict/tmp/{filename_for_predict}', model_new_poly, new_poly))
+        print(test_growth)
+        test_test = test_growth / read_csv.followers * 100
+        print('test_test')
+        print(test_test)
+        print(test_test[0])
+        max_of_sc = value2.max_of_scale
+        print('max')
+        print(max_of_sc)
+        our_quality = create_scale_and_detecting_quality(max_of_sc, test_test[0])
+        print(our_quality)
+        #test_list_with_data = [test_growth[0],test_test[0],max_of_sc,our_quality]
+        form.predict_value.data = test_growth[0]
+        form.max_of_scale.data = max_of_sc
+        form.growth_procent.data = test_test[0]
+        form.quality.data= our_quality
+
+        flash('Your topic has been created!', 'success')
+    return render_template('add_predict.html', title='Make predict', form=form, legend='Make predict')
 
 
 def admin_login_required(func):

@@ -63,19 +63,23 @@ class UpdateAccountForm(FlaskForm):
 
 class AddTopic(FlaskForm):
     title = StringField('Title', validators=[DataRequired()],render_kw={"placeholder": "It is your content title"})
-    image_file = FileField('Choose txt file with usernames', validators=[FileAllowed(['txt'])])
+    image_file = FileField('Choose txt file with usernames', validators=[FileAllowed(['txt']),DataRequired()])
     type = SelectField(u'Type', choices=[('Twitter', 'Twitter'), ('Instagram', 'Instagram')])
     submit = SubmitField('Add topic')
 
-class MicroBlogModelView(ModelView):
-    def is_accessible(self):
-        return current_user.is_authenticated
+#class AddPredict(FlaskForm):
+#    username = StringField('Username', validators=[DataRequired()],render_kw={"placeholder": "Enter your username"})
+#    topic = StringField('Choose topic', validators=[DataRequired()],render_kw={"placeholder": "Enter your username"})
+#    submit = SubmitField('Make predict')
 
-    def inaccessible_callback(self, name, **kwargs):
-        # redirect to login page if user doesn't have access
-        return redirect(url_for('login', next=request.url))
-
-
+class AddPredict(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()],render_kw={"placeholder": "Enter your username"})
+    topic = StringField('Choose topic', validators=[DataRequired()],render_kw={"placeholder": "Enter your username"})
+    predict_value = StringField('This is predict Value')
+    growth_procent = StringField('Predict growth in %')
+    max_of_scale = StringField('Max of this scale')
+    quality = StringField('Your quality is ')
+    submit = SubmitField('Make predict')
 
 class MyAdminIndexView(AdminIndexView):
     def is_accessible(self):
