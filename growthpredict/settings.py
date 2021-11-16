@@ -6,7 +6,7 @@ SECRET_KEY = os.urandom(32)
 #app.config['SECRET_KEY'] = SECRET_KEY
 
 #basedir = os.path.abspath(os.path.dirname(__file__))
-SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://mmmdasrcynxnoc:c84c95ae88cd24be00ea751da1e92f82b1e3418022929966def6a054340ae8e4@ec2-3-230-149-158.compute-1.amazonaws.com:5432/d4gfugsi3nv9a'
+SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgres://mmmdasrcynxnoc:c84c95ae88cd24be00ea751da1e92f82b1e3418022929966def6a054340ae8e4@ec2-3-230-149-158.compute-1.amazonaws.com:5432/d4gfugsi3nv9a'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 import os
 import re
