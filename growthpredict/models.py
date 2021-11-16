@@ -34,14 +34,14 @@ class Post_inst(db.Model):
     __tablename__ = 'posts_inst'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), nullable=False)
-    avg_views = db.Column(db.Integer)
-    avg_likes = db.Column(db.Integer)
-    avg_comments = db.Column(db.Integer)
+    avg_views = db.Column(db.Float)
+    avg_likes = db.Column(db.Float)
+    avg_comments = db.Column(db.Float)
     followers = db.Column(db.Integer)
     media = db.Column(db.Integer)
-    avg_er = db.Column(db.Integer)
-    growth = db.Column(db.Integer)
-    growth_predict = db.Column(db.Integer)
+    avg_er = db.Column(db.Float)
+    growth = db.Column(db.Float)
+    growth_predict = db.Column(db.Float)
     def __repr__(self):
         return self.username
 
@@ -49,15 +49,15 @@ class Post_twit(db.Model):
     __tablename__ = 'posts_twit'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), nullable=False)
-    avg_view_count = db.Column(db.Integer)
-    avg_retweet_count = db.Column(db.Integer)
-    avg_reply_count = db.Column(db.Integer)
-    avg_like_count = db.Column(db.Integer)
-    avg_quote_count = db.Column(db.Integer)
+    avg_view_count = db.Column(db.Float)
+    avg_retweet_count = db.Column(db.Float)
+    avg_reply_count = db.Column(db.Float)
+    avg_like_count = db.Column(db.Float)
+    avg_quote_count = db.Column(db.Float)
     media = db.Column(db.Integer)
-    avg_er = db.Column(db.Integer)
-    growth = db.Column(db.Integer)
-    growth_predict = db.Column(db.Integer)
+    avg_er = db.Column(db.Float)
+    growth = db.Column(db.Float)
+    growth_predict = db.Column(db.Float)
     followers = db.Column(db.Integer)
     def __repr__(self):
         return self.username
@@ -66,6 +66,9 @@ class Topic_inst(db.Model):
     __tablename__ = 'topics_inst'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
+    model_linear = db.Column(db.PickleType())
+    model_poly = db.Column(db.PickleType())
+    poly = db.Column(db.PickleType())
     usernames = db.relationship('Post_inst', secondary='topic_posts_inst')
 
 class TopicPosts_inst(db.Model):
@@ -78,6 +81,9 @@ class Topic_twit(db.Model):
     __tablename__ = 'topics_twit'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
+    model_linear = db.Column(db.PickleType())
+    model_poly = db.Column(db.PickleType())
+    poly= db.Column(db.PickleType())
     usernames = db.relationship('Post_twit', secondary='topic_posts_twit')
 
 class TopicPosts_twit(db.Model):

@@ -1,13 +1,13 @@
 {
     "data": {
-        "username": "ManCity",
+        "public_metrics": {
+            "followers_count": 10906829,
+            "following_count": 51025,
+            "tweet_count": 144477,
+            "listed_count": 16250
+        },
         "id": "14573900",
         "name": "Manchester City",
-        "public_metrics": {
-            "followers_count": 10900419,
-            "following_count": 51029,
-            "tweet_count": 144463,
-            "listed_count": 16251
-        }
+        "username": "ManCity"
     }
 }

@@ -64,7 +64,7 @@ class UpdateAccountForm(FlaskForm):
 class AddTopic(FlaskForm):
     title = StringField('Title', validators=[DataRequired()],render_kw={"placeholder": "It is your content title"})
     image_file = FileField('Choose txt file with usernames', validators=[FileAllowed(['txt'])])
-    type = SelectField(u'Type', choices=[('Instagram', 'Instagram'), ('Twitter', 'Twitter')])
+    type = SelectField(u'Type', choices=[('Twitter', 'Twitter'), ('Instagram', 'Instagram')])
     submit = SubmitField('Add topic')
 
 class MicroBlogModelView(ModelView):
