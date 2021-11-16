@@ -1,4 +1,5 @@
 import pandas
+import pandas as pd
 
 from growthpredict import app, db, bcrypt
 from flask import json,jsonify, render_template,url_for, flash, redirect, request,abort, session,Response
@@ -161,6 +162,7 @@ def add_topic():
             data_for_save_poly = pickle.dumps(test_poly)
             data_for_save_model_linear = pickle.dumps(test_linear)
             value = Topic_twit.query.filter(Topic_twit.name == str(form.title.data)).first()
+            value.max_of_scale = max_of_scale
             value.model_linear = data_for_save_model_linear
             value.model_poly = data_for_save_model_poly
             value.poly = data_for_save_poly
@@ -177,12 +179,25 @@ def add_topic():
             new_poly = pickle.loads(value2.poly)
             model_new_linear = pickle.loads(value2.model_linear)
             file_for_predict = 'test_1twitter.csv'
+
+            read_csv = pd.read_csv(f'growthpredict/tmp/{file_for_predict}')
             print(use_poly2_model(f'growthpredict/tmp/{file_for_predict}',test_model_poly, test_poly))
             print(use_linear_model(f'growthpredict/tmp/{file_for_predict}', test_linear))
 
             print("test use withh download models")
             print(use_poly2_model(f'growthpredict/tmp/{file_for_predict}', model_new_poly, new_poly))
             print(use_linear_model(f'growthpredict/tmp/{file_for_predict}', model_new_linear))
+            test_growth = (use_poly2_model(f'growthpredict/tmp/{file_for_predict}', model_new_poly, new_poly))
+            print(test_growth)
+            test_test = test_growth/read_csv.followers*100
+            print('test_test')
+            print(test_test)
+            print(test_test[0])
+            max_of_sc = value2.max_of_scale
+            print('max')
+            print(max_of_sc)
+            our_quality = create_scale_and_detecting_quality(max_of_sc,test_test[0])
+            print(our_quality)
             """
             file_for_predict22 = 'TWITTER_TEST_csv.csv'
             print('secondtry')

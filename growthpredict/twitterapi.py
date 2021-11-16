@@ -636,11 +636,31 @@ def use_linear_model(input, model):
     return test
 
 
+
 #print(use_linear_model('test_1twitter.csv', test_linear_model))
 
 
-#def create_scale(filename):
-#    df = pd.read_csv(filename)
+def create_scale_and_detecting_quality(max_of_scale,our_growth):
+    quality = ''
+    if our_growth >= max_of_scale:
+        quality = "Fantastic growth"
+        return quality
+    elif our_growth >=0.618*max_of_scale and our_growth<max_of_scale:
+        quality = "Very good growth"
+        return quality
+    elif our_growth >=0.382*max_of_scale and our_growth<max_of_scale*0.618:
+        quality = "Good growth"
+        return quality
+    elif our_growth >=0.236*max_of_scale and our_growth<max_of_scale*0.382:
+        quality = "Normal growth"
+        return quality
+    elif our_growth >=0.146*max_of_scale and our_growth<max_of_scale*0.236:
+        quality = "Bad growth"
+        return quality
+    elif our_growth<max_of_scale*0.146:
+        quality = "Very bad growth"
+        return quality
+
 
 
 """

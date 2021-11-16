@@ -69,6 +69,7 @@ class Topic_inst(db.Model):
     model_linear = db.Column(db.PickleType())
     model_poly = db.Column(db.PickleType())
     poly = db.Column(db.PickleType())
+    max_of_scale=db.Column(db.Float)
     usernames = db.relationship('Post_inst', secondary='topic_posts_inst')
 
 class TopicPosts_inst(db.Model):
@@ -84,6 +85,7 @@ class Topic_twit(db.Model):
     model_linear = db.Column(db.PickleType())
     model_poly = db.Column(db.PickleType())
     poly= db.Column(db.PickleType())
+    max_of_scale = db.Column(db.Float)
     usernames = db.relationship('Post_twit', secondary='topic_posts_twit')
 
 class TopicPosts_twit(db.Model):
