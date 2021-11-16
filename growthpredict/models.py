@@ -100,10 +100,10 @@ def init_db():
     db.create_all()
 
     # Create a test user
-    #new_user = User('a@a.com', 'aaaaaaaa')
+    new_user = User('a@a.com', 'aaaaaaaa')
     #new_user.display_name = 'Nathan'
-    #db.session.add(new_user)
-    #db.session.commit()
+    db.session.add(new_user)
+    db.session.commit()
 
     new_task_t = Post_twit(username='test')
     db.session.add(new_task_t)
