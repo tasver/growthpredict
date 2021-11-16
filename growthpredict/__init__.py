@@ -5,7 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 #from settings import *
 from flask_admin import Admin, BaseView, expose
-
+from flask_script import Manager
 app = Flask(__name__)
 
 config_file='settings.py'
@@ -13,7 +13,7 @@ app.config.from_pyfile(config_file)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
-
+manager = Manager(app)
 
 
 bcrypt = Bcrypt(app)
